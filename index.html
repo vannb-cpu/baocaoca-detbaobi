@@ -31,7 +31,40 @@
       <option>Ca 2 (18:00 - 07:00)</option>
     </select>
     <label>Tên công nhân</label>
-    <input type="text" id="congNhan" placeholder="Họ và tên">
+    <select id="congNhanChon" onchange="toggleTenKhac()">
+      <option value="">-- Chọn tên --</option>
+      <option>Trần Văn Thi</option>
+      <option>La Thị Đình</option>
+      <option>Trần Văn Tính</option>
+      <option>Trần Thị Hưng</option>
+      <option>Nguyễn Thị Quỳnh</option>
+      <option>Trần Công Minh</option>
+      <option>Trương Thị Bắc</option>
+      <option>Hoàng Thị Linh</option>
+      <option>Đào Thanh Tài</option>
+      <option>Hoàng Thị Hiền</option>
+      <option>Doãn Trí Tuệ</option>
+      <option>Bùi Văn Thắng</option>
+      <option>Nguyễn Văn Viện</option>
+      <option>Trần Công Định</option>
+      <option>Trương Thị Thúy</option>
+      <option>Bàn Sinh Lộc</option>
+      <option>Lý Thị Vân</option>
+      <option>Lò Thị Quân</option>
+      <option>Triệu Thị Minh</option>
+      <option>Lê Văn Dân</option>
+      <option>Bàn Thị Loan</option>
+      <option>Nguyễn Văn Tuấn</option>
+      <option>Hoàng Văn Huân</option>
+      <option>Hoàng Thị Huấn</option>
+      <option>Ngô Quang Trường (HV)</option>
+      <option>Nguyễn Thành Khải (HV)</option>
+      <option>Võ Ngọc Huy (HV)</option>
+      <option>Lê Tiến Ngọc (HV)</option>
+      <option>Trần Thu Hiền (HV)</option>
+      <option value="Khác">Khác (tự nhập)</option>
+    </select>
+    <input type="text" id="congNhanKhac" placeholder="Nhập họ và tên" style="display:none;">
   </div>
 
   <div class="card">
@@ -84,6 +117,11 @@
   function themDong() { taoDong(); }
   for (var i = 0; i < 3; i++) taoDong();
 
+  function toggleTenKhac() {
+    var chon = document.getElementById('congNhanChon').value;
+    document.getElementById('congNhanKhac').style.display = chon === 'Khác' ? 'block' : 'none';
+  }
+
   function toggleSuCo() {
     document.getElementById('suCoDetail').style.display =
       document.getElementById('coSuCo').value === 'Có' ? 'block' : 'none';
@@ -94,7 +132,10 @@
   function guiBaoCao() {
     var ngay = document.getElementById('ngay').value;
     var ca = document.getElementById('ca').value;
-    var congNhan = document.getElementById('congNhan').value.trim();
+    var congNhanChon = document.getElementById('congNhanChon').value;
+    var congNhan = congNhanChon === 'Khác'
+      ? document.getElementById('congNhanKhac').value.trim()
+      : congNhanChon;
     if (!ngay || !ca || !congNhan) {
       alert('Vui lòng điền đủ Ngày, Ca, Tên công nhân.');
       return;
