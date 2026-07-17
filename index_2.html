@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background:#f5f5f5; color:#222; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  .card { background:#fff; border-radius:8px; padding:12px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
+  .section-title { font-weight:bold; font-size:14px; margin-bottom:8px; display:block; }
+  label { font-size:13px; color:#555; display:block; margin-bottom:4px; }
+  input, select, textarea { width:100%; box-sizing:border-box; padding:8px; font-size:14px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:8px; }
+  th, td { border:1px solid #ddd; padding:4px; font-size:12px; }
+  th { background:#f0f0f0; }
+  .row-inputs input, .row-inputs select { margin-bottom:0; padding:6px 4px; font-size:13px; }
+  button { width:100%; padding:12px; font-size:15px; border:none; border-radius:6px; background:#1a73e8; color:#fff; margin-top:6px; }
+  button.secondary { background:#eee; color:#333; }
+  button:disabled { opacity:0.6; }
+  #status { text-align:center; margin-top:10px; font-size:14px; font-weight:bold; }
+</style>
+</head>
+<body>
+  <h2>Báo cáo ca - Thợ máy dệt bao bì (NM Yên Bái)</h2>
+
+  <div class="card">
+    <label>Ngày sản xuất</label>
+    <input type="date" id="ngay">
+    <label>Ca sản xuất</label>
+    <select id="ca">
+      <option>Ca 1 (07:00 - 18:00)</option>
+      <option>Ca 2 (18:00 - 07:00)</option>
+    </select>
+    <label>Tên công nhân</label>
+    <input type="text" id="congNhan" placeholder="Họ và tên">
+  </div>
+
+  <div class="card">
+    <span class="section-title">1. Số liệu máy</span>
+    <table id="tblMay">
+      <thead><tr><th>Số máy</th><th>Mét cuối ca</th><th>Khổ/loại hàng</th><th>Mét trước cắt</th></tr></thead>
+      <tbody id="tblMayBody"></tbody>
+    </table>
+    <button type="button" class="secondary" onclick="themDong()">+ Thêm máy</button>
+  </div>
+
+  <div class="card">
+    <span class="section-title">2. Sự cố / dừng máy trong ca</span>
+    <label>Có sự cố?</label>
+    <select id="coSuCo" onchange="toggleSuCo()">
+      <option value="Không">Không</option>
+      <option value="Có">Có</option>
+    </select>
+    <div id="suCoDetail" style="display:none;">
+      <label>Máy liên quan</label>
+      <input type="text" id="mayLienQuan" placeholder="VD: 45">
+      <label>Mô tả sự cố</label>
+      <textarea id="moTaSuCo" rows="2"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="section-title">3. Ý kiến của thợ (không bắt buộc)</span>
+    <textarea id="yKien" rows="2"></textarea>
+  </div>
+
+  <button id="btnGui" onclick="guiBaoCao()">Gửi báo cáo</button>
+  <div id="status"></div>
+
+<script>
+  // ====== CHỖ DUY NHẤT CẦN CHỈNH: dán đúng link /exec của Web App vào đây ======
+  var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzNxN6t6EM9ohRPi4xLEurrA9dOuT1h8O5Cho_Hx6MxwWgy2WK0Aagm7riSb2RUMlT_/exec';
+  // ============================================================================
+
+  function taoDong() {
+    var tr = document.createElement('tr');
+    tr.className = 'row-inputs';
+    tr.innerHTML =
+      '<td><input type="text" class="soMay" inputmode="numeric"></td>' +
+      '<td><input type="text" class="cuoiCa" inputmode="numeric"></td>' +
+      '<td><select class="khoLoai"><option>Nhỏ khổ 48XK</option><option>Nhỏ khổ 52</option><option>Trung khổ 60-79</option><option>Khác</option></select></td>' +
+      '<td><input type="text" class="metCat" inputmode="numeric" placeholder="để trống nếu không cắt"></td>';
+    document.getElementById('tblMayBody').appendChild(tr);
+  }
+  function themDong() { taoDong(); }
+  for (var i = 0; i < 3; i++) taoDong();
+
+  function toggleSuCo() {
+    document.getElementById('suCoDetail').style.display =
+      document.getElementById('coSuCo').value === 'Có' ? 'block' : 'none';
+  }
+
+  document.getElementById('ngay').value = new Date().toISOString().slice(0, 10);
+
+  function guiBaoCao() {
+    var ngay = document.getElementById('ngay').value;
+    var ca = document.getElementById('ca').value;
+    var congNhan = document.getElementById('congNhan').value.trim();
+    if (!ngay || !ca || !congNhan) {
+      alert('Vui lòng điền đủ Ngày, Ca, Tên công nhân.');
+      return;
+    }
+
+    var rows = document.querySelectorAll('#tblMayBody tr');
+    var machines = [];
+    rows.forEach(function (r) {
+      var soMay = r.querySelector('.soMay').value.trim();
+      if (!soMay) return;
+      machines.push({
+        soMay: soMay,
+        cuoiCa: r.querySelector('.cuoiCa').value.trim(),
+        khoLoai: r.querySelector('.khoLoai').value,
+        metCat: r.querySelector('.metCat').value.trim()
+      });
+    });
+    if (machines.length === 0) {
+      alert('Chưa nhập máy nào.');
+      return;
+    }
+
+    var payload = {
+      ngay: ngay, ca: ca, congNhan: congNhan,
+      machines: machines,
+      coSuCo: document.getElementById('coSuCo').value,
+      mayLienQuan: document.getElementById('mayLienQuan').value,
+      moTaSuCo: document.getElementById('moTaSuCo').value,
+      yKien: document.getElementById('yKien').value
+    };
+
+    var btn = document.getElementById('btnGui');
+    btn.disabled = true;
+    document.getElementById('status').innerText = 'Đang gửi...';
+
+    // Gửi ngầm tới Apps Script bằng fetch, dùng text/plain để tránh bị chặn CORS
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function () {
+      // no-cors nên không đọc được phản hồi thật, coi như gửi thành công nếu không có lỗi mạng
+      document.getElementById('status').innerText = 'Đã gửi báo cáo!';
+      document.getElementById('tblMayBody').innerHTML = '';
+      for (var i = 0; i < 3; i++) taoDong();
+      document.getElementById('mayLienQuan').value = '';
+      document.getElementById('moTaSuCo').value = '';
+      document.getElementById('yKien').value = '';
+      document.getElementById('coSuCo').value = 'Không';
+      toggleSuCo();
+      btn.disabled = false;
+    }).catch(function (err) {
+      document.getElementById('status').innerText = 'Lỗi mạng, vui lòng thử lại: ' + err.message;
+      btn.disabled = false;
+    });
+  }
+</script>
+</body>
+</html>
