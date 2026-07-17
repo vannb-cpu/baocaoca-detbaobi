@@ -70,7 +70,7 @@
   <div class="card">
     <span class="section-title">1. Số liệu máy</span>
     <table id="tblMay">
-      <thead><tr><th>Số máy</th><th>Khổ/loại hàng</th><th>Mét cuối ca</th><th>Mét trước cắt</th></tr></thead>
+      <thead><tr><th>Số máy</th><th>Khổ/loại hàng</th><th>Mét cuối ca</th><th>Mét trước cắt (để trống nếu không cắt)</th></tr></thead>
       <tbody id="tblMayBody"></tbody>
     </table>
     <button type="button" class="secondary" onclick="themDong()">+ Thêm máy</button>
@@ -116,7 +116,7 @@
         '<option value="Khác">Khác (tự nhập)</option></select>' +
         '<input type="text" class="khoKhac" placeholder="Nhập khổ" style="display:none;margin-top:4px;"></td>' +
       '<td><input type="text" class="cuoiCa" inputmode="numeric"></td>' +
-      '<td><input type="text" class="metCat" inputmode="numeric" placeholder="để trống nếu không cắt"></td>';
+      '<td><input type="text" class="metCat" inputmode="numeric"></td>';
     document.getElementById('tblMayBody').appendChild(tr);
   }
   function themDong() { taoDong(); }
