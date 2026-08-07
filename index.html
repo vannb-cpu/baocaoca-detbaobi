@@ -31,13 +31,46 @@
       <option>Ca 2 (18:00 - 07:00)</option>
     </select>
     <label>Tên công nhân</label>
-    <input type="text" id="congNhan" placeholder="Họ và tên">
+    <select id="congNhanChon" onchange="toggleTenKhac()">
+      <option value="">-- Chọn tên --</option>
+      <option>Trần Văn Thi</option>
+      <option>La Thị Đình</option>
+      <option>Trần Văn Tính</option>
+      <option>Trần Thị Hưng</option>
+      <option>Nguyễn Thị Quỳnh</option>
+      <option>Trần Công Minh</option>
+      <option>Trương Thị Bắc</option>
+      <option>Hoàng Thị Linh</option>
+      <option>Đào Thanh Tài</option>
+      <option>Hoàng Thị Hiền</option>
+      <option>Doãn Trí Tuệ</option>
+      <option>Bùi Văn Thắng</option>
+      <option>Nguyễn Văn Viện</option>
+      <option>Trần Công Định</option>
+      <option>Trương Thị Thúy</option>
+      <option>Bàn Sinh Lộc</option>
+      <option>Lý Thị Vân</option>
+      <option>Lò Thị Quân</option>
+      <option>Triệu Thị Minh</option>
+      <option>Lê Văn Dân</option>
+      <option>Bàn Thị Loan</option>
+      <option>Nguyễn Văn Tuấn</option>
+      <option>Hoàng Văn Huân</option>
+      <option>Hoàng Thị Huấn</option>
+      <option>Ngô Quang Trường (HV)</option>
+      <option>Nguyễn Thành Khải (HV)</option>
+      <option>Võ Ngọc Huy (HV)</option>
+      <option>Lê Tiến Ngọc (HV)</option>
+      <option>Trần Thu Hiền (HV)</option>
+      <option value="Khác">Khác (tự nhập)</option>
+    </select>
+    <input type="text" id="congNhanKhac" placeholder="Nhập họ và tên" style="display:none;">
   </div>
 
   <div class="card">
     <span class="section-title">1. Số liệu máy</span>
     <table id="tblMay">
-      <thead><tr><th>Số máy</th><th>Mét cuối ca</th><th>Khổ/loại hàng</th><th>Mét trước cắt</th></tr></thead>
+      <thead><tr><th>Số máy</th><th>Khổ/loại hàng</th><th>Mét cuối ca</th><th>Mét trước cắt</th></tr></thead>
       <tbody id="tblMayBody"></tbody>
     </table>
     <button type="button" class="secondary" onclick="themDong()">+ Thêm máy</button>
@@ -78,13 +111,28 @@
     tr.className = 'row-inputs';
     tr.innerHTML =
       '<td><input type="text" class="soMay" inputmode="numeric"></td>' +
+      '<td><select class="khoLoai" onchange="toggleKhoKhac(this)">' +
+        '<option>Khổ 42</option><option>Khổ 45</option><option>Khổ 48</option>' +
+        '<option>Khổ 52</option><option>Khổ 55</option><option>Khổ 60</option>' +
+        '<option>Khổ 65</option><option>Khổ 70</option><option>Khổ 80</option>' +
+        '<option value="Khác">Khác (tự nhập)</option></select>' +
+        '<input type="text" class="khoKhac" placeholder="Nhập khổ" style="display:none;margin-top:4px;"></td>' +
       '<td><input type="text" class="cuoiCa" inputmode="numeric"></td>' +
-      '<td><select class="khoLoai"><option>Nhỏ khổ 48XK</option><option>Nhỏ khổ 52</option><option>Trung khổ 60-79</option><option>Khác</option></select></td>' +
       '<td><input type="text" class="metCat" inputmode="numeric" placeholder="để trống nếu không cắt"></td>';
     document.getElementById('tblMayBody').appendChild(tr);
   }
   function themDong() { taoDong(); }
   for (var i = 0; i < 3; i++) taoDong();
+
+  function toggleKhoKhac(sel) {
+    var input = sel.parentElement.querySelector('.khoKhac');
+    input.style.display = sel.value === 'Khác' ? 'block' : 'none';
+  }
+
+  function toggleTenKhac() {
+    var chon = document.getElementById('congNhanChon').value;
+    document.getElementById('congNhanKhac').style.display = chon === 'Khác' ? 'block' : 'none';
+  }
 
   function toggleSuCo() {
     document.getElementById('suCoDetail').style.display =
@@ -96,7 +144,10 @@
   function guiBaoCao() {
     var ngay = document.getElementById('ngay').value;
     var ca = document.getElementById('ca').value;
-    var congNhan = document.getElementById('congNhan').value.trim();
+    var congNhanChon = document.getElementById('congNhanChon').value;
+    var congNhan = congNhanChon === 'Khác'
+      ? document.getElementById('congNhanKhac').value.trim()
+      : congNhanChon;
     if (!ngay || !ca || !congNhan) {
       alert('Vui lòng điền đủ Ngày, Ca, Tên công nhân.');
       return;
@@ -107,10 +158,12 @@
     rows.forEach(function (r) {
       var soMay = r.querySelector('.soMay').value.trim();
       if (!soMay) return;
+      var khoSel = r.querySelector('.khoLoai').value;
+      var khoLoai = khoSel === 'Khác' ? r.querySelector('.khoKhac').value.trim() : khoSel;
       machines.push({
         soMay: soMay,
         cuoiCa: r.querySelector('.cuoiCa').value.trim(),
-        khoLoai: r.querySelector('.khoLoai').value,
+        khoLoai: khoLoai,
         metCat: r.querySelector('.metCat').value.trim()
       });
     });
